@@ -1,0 +1,18 @@
+package demo.auth
+
+// User profile exchanged between auth service and clients.
+message User {
+  reserved 6
+  1: id Int64
+  2: name String
+  3: email String?
+  4: roles List[String]
+  5: status UserStatus
+}
+
+enum UserStatus {
+  reserved 3
+  0: Unknown
+  1: Active
+  2: Disabled
+}

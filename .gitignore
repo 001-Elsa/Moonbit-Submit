@@ -1,0 +1,18 @@
+# MoonBit 工具链安装/下载
+.downloads/
+.install-home/
+.toolchains/
+.moonhome/
+
+# 第三方依赖缓存
+.mooncakes/
+
+# 构建产物
+_build/
+
+# 诊断文件
+trace.json
+
+# 其他
+.repos/
+.scratch/

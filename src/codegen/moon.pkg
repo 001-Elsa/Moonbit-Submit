@@ -1,0 +1,3 @@
+import {
+  "local/moonpack/src/schema" @schema
+}

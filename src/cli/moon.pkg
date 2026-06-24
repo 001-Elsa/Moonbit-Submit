@@ -1,0 +1,10 @@
+import {
+  "local/moonpack/src/schema" @schema,
+  "local/moonpack/src/codegen" @codegen,
+  "moonbitlang/x/fs" @fs,
+  "moonbitlang/x/sys" @sys,
+}
+
+options(
+  "is-main": true,
+)

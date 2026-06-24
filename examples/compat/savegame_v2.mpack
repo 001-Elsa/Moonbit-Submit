@@ -1,0 +1,13 @@
+package demo.compat
+
+message Save {
+  reserved 2
+  1: id String
+  3: title String
+}
+
+enum State {
+  reserved 1
+  0: Unknown
+  2: Disabled
+}

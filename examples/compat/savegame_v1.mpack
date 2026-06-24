@@ -1,0 +1,11 @@
+package demo.compat
+
+message Save {
+  1: id String
+  2: score Int
+}
+
+enum State {
+  0: Unknown
+  1: Active
+}

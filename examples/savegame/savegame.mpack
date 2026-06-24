@@ -1,0 +1,21 @@
+package demo.savegame
+
+message Vec2 {
+  1: x Double
+  2: y Double
+}
+
+message InventoryItem {
+  1: item_id String
+  2: count Int
+}
+
+message SaveGame {
+  reserved 6
+  reserved 10..20
+  1: player_id String
+  2: level Int
+  3: position Vec2
+  4: inventory List[InventoryItem]
+  5: note String?
+}

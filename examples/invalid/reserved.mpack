@@ -1,0 +1,6 @@
+package demo.invalid
+
+message User {
+  reserved 1
+  1: id Int64
+}
