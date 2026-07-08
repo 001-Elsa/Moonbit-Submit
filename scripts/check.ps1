@@ -5,12 +5,15 @@ $localMoonHome = Join-Path $root ".moonhome"
 $parentMoonHome = Join-Path (Split-Path -Parent $root) ".moonhome"
 if (Test-Path $localMoonHome) {
   $env:MOON_HOME = $localMoonHome
+  $env:PATH = (Join-Path $env:MOON_HOME "bin") + [IO.Path]::PathSeparator + $env:PATH
 } elseif (Test-Path $parentMoonHome) {
   $env:MOON_HOME = $parentMoonHome
+  $env:PATH = (Join-Path $env:MOON_HOME "bin") + [IO.Path]::PathSeparator + $env:PATH
+} elseif (-not (Get-Command moon -ErrorAction SilentlyContinue)) {
+  throw "MoonBit toolchain not found. Expected moon in PATH or .moonhome under project root or parent directory."
 } else {
-  throw "MoonBit toolchain not found. Expected .moonhome under project root or parent directory."
+  Write-Output "Using MoonBit toolchain from PATH."
 }
-$env:PATH = (Join-Path $env:MOON_HOME "bin") + ";" + $env:PATH
 
 moon version --all
 moon check
