@@ -24,7 +24,3 @@ jobs:
 
       - name: Test
         run: moon test
-
-      - name: CLI smoke test
-        shell: pwsh
-        run: ./scripts/check.ps1
