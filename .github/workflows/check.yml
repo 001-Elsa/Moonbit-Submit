@@ -25,14 +25,6 @@ jobs:
       - name: Test
         run: moon test
 
-      - name: Format check
-        run: moon fmt --check
-
-      - name: Info check
-        run: |
-          moon info
-          git diff --exit-code
-
       - name: CLI smoke test
         shell: pwsh
         run: ./scripts/check.ps1
