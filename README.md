@@ -47,6 +47,20 @@ library that is easier to inspect, extend, and use in contest-sized projects.
 This repository contains a working MVP. It can parse `.mpack` schemas, validate
 them, generate MoonBit code, and run generated round-trip tests.
 
+## Acceptance Status
+
+- GitHub repository: https://github.com/001-Elsa/Moonbit-Submit
+- Gitlink repository: https://gitlink.org.cn/Hanzzz/MoonPack_Hz
+- Mooncakes package: `001-Elsa/moonpack@0.1.0`
+- CI command set: `moon check` and `moon test`
+- Local verification script: `powershell -ExecutionPolicy Bypass -File .\scripts\check.ps1`
+
+Fetch the published package with:
+
+```powershell
+moon fetch 001-Elsa/moonpack@0.1.0
+```
+
 ## Example Schema
 
 ```text
@@ -190,17 +204,18 @@ decode_save_game(bytes)
 
 ```text
 D:\moonbit\
-  plan.md
   README.md
-  moon.mod.json
+  LICENSE
+  moon.mod
   docs\
   examples\
+  generated\
+  scripts\
   src\
     core\
     schema\
     codegen\
     cli\
-  tests\
 ```
 
 ## Competition Value
