@@ -19,6 +19,7 @@ pub struct FieldDecl {
   name : String
   ty : TypeRef
   optional : Bool
+  deprecated : Bool
   line : Int
   column : Int
 }

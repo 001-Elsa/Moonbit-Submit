@@ -4,7 +4,8 @@ fn print_usage() -> Unit {
   println("Usage:")
   println("  moonpack check <schema.mpack>")
   println("  moonpack compat <old.mpack> <new.mpack>")
-  println("  moonpack gen <schema.mpack> -o <dir>")
+  println("  moonpack gen <schema.mpack> -o <dir> [--no-tests]")
+  println("  moonpack doc <schema.mpack> -o <dir>")
 }
 
 fn[T] fail(message : String) -> T {
@@ -64,6 +65,19 @@ fn package_output_dir(out_dir : String, package_name : String) -> String {
   current
 }
 
+fn package_doc_path(out_dir : String, package_name : String) -> String {
+  ensure_dir(out_dir)
+  let parts = package_parts(package_name)
+  let mut current = out_dir
+  let mut i = 0
+  while i + 1 < parts.length() {
+    current = current + "/" + parts[i]
+    ensure_dir(current)
+    i = i + 1
+  }
+  current + "/" + parts[parts.length() - 1] + ".md"
+}
+
 fn command_check(path : String) -> Unit {
   let schema = read_schema(path)
   println("ok: " + schema.package_name)
@@ -78,38 +92,58 @@ fn command_compat(old_path : String, new_path : String) -> Unit {
   }
 }
 
-fn command_gen(path : String, out_dir : String) -> Unit {
+fn command_gen(path : String, out_dir : String, write_tests : Bool) -> Unit {
   let schema = read_schema(path)
   let package_dir = package_output_dir(out_dir, schema.package_name)
+  let mut count = 0
   for decl in schema.declarations {
     let stem = @codegen.decl_file_stem(decl)
     let output = package_dir + "/" + stem + ".mbt"
     @fs.write_string_to_file(output, @codegen.emit_decl(schema, decl)) catch {
       _ => fail("cannot write generated file '\{output}'")
     }
+    count = count + 1
     let tests = @codegen.emit_decl_tests(schema, decl)
-    if tests.length() > 0 {
+    if write_tests && tests.length() > 0 {
       let test_output = package_dir + "/" + stem + "_test.mbt"
       @fs.write_string_to_file(test_output, tests) catch {
         _ => fail("cannot write generated test file '\{test_output}'")
       }
+      count = count + 1
     }
   }
   let pkg = "import {\n  \"local/moonpack/src/core\" @core\n}\n"
   @fs.write_string_to_file(package_dir + "/moon.pkg", pkg) catch {
     _ => fail("cannot write generated package file")
   }
-  println("generated: " + package_dir)
+  count = count + 1
+  println("generated: " + package_dir + " (" + count.to_string() + " files)")
+}
+
+fn command_doc(path : String, out_dir : String) -> Unit {
+  let schema = read_schema(path)
+  let output = package_doc_path(out_dir, schema.package_name)
+  @fs.write_string_to_file(output, @codegen.emit_schema_doc(schema)) catch {
+    _ => fail("cannot write schema documentation '\{output}'")
+  }
+  println("documented: " + output)
 }
 
 fn main {
   let args = @sys.get_cli_args()
-  if args.length() < 2 {
+  if args.length() < 2 || args[1] == "--help" || args[1] == "-h" {
     print_usage()
-    @sys.exit(1)
+    if args.length() < 2 {
+      @sys.exit(1)
+    }
+    @sys.exit(0)
   }
   match args[1] {
     "check" => {
+      if args.length() == 3 && (args[2] == "--help" || args[2] == "-h") {
+        print_usage()
+        @sys.exit(0)
+      }
       if args.length() != 3 {
         print_usage()
         @sys.exit(1)
@@ -117,6 +151,10 @@ fn main {
       command_check(args[2])
     }
     "compat" => {
+      if args.length() == 3 && (args[2] == "--help" || args[2] == "-h") {
+        print_usage()
+        @sys.exit(0)
+      }
       if args.length() != 4 {
         print_usage()
         @sys.exit(1)
@@ -124,11 +162,37 @@ fn main {
       command_compat(args[2], args[3])
     }
     "gen" => {
+      if args.length() == 3 && (args[2] == "--help" || args[2] == "-h") {
+        print_usage()
+        @sys.exit(0)
+      }
+      if (args.length() != 5 && args.length() != 6) || args[3] != "-o" {
+        print_usage()
+        @sys.exit(1)
+      }
+      let write_tests = if args.length() == 6 {
+        if args[5] == "--no-tests" {
+          false
+        } else {
+          print_usage()
+          @sys.exit(1)
+          true
+        }
+      } else {
+        true
+      }
+      command_gen(args[2], args[4], write_tests)
+    }
+    "doc" => {
+      if args.length() == 3 && (args[2] == "--help" || args[2] == "-h") {
+        print_usage()
+        @sys.exit(0)
+      }
       if args.length() != 5 || args[3] != "-o" {
         print_usage()
         @sys.exit(1)
       }
-      command_gen(args[2], args[4])
+      command_doc(args[2], args[4])
     }
     _ => {
       print_usage()

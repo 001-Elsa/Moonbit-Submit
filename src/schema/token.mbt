@@ -5,6 +5,7 @@ pub enum TokenKind {
   KeywordMessage
   KeywordEnum
   KeywordReserved
+  KeywordDeprecated
   LBrace
   RBrace
   LBracket
@@ -41,6 +42,7 @@ pub fn token_name(kind : TokenKind) -> String {
     KeywordMessage => "message"
     KeywordEnum => "enum"
     KeywordReserved => "reserved"
+    KeywordDeprecated => "deprecated"
     LBrace => "{"
     RBrace => "}"
     LBracket => "["

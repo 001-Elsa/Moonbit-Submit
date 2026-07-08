@@ -128,6 +128,7 @@ pub fn Lexer::next(self : Lexer) -> Token {
           "message" => KeywordMessage
           "enum" => KeywordEnum
           "reserved" => KeywordReserved
+          "deprecated" => KeywordDeprecated
           _ => Ident(ident)
         }
         { kind, line, column }

@@ -62,3 +62,38 @@ test "compatibility rejects removed unreserved fields" {
     _ => fail("schemas should parse")
   }
 }
+
+test "parse deprecated field marker" {
+  let text = "package demo\nmessage Save { 1: id String 2: old_score Int deprecated }\n"
+  match parse_schema(text) {
+    Ok(schema) => match schema.declarations[0] {
+      Message(msg) => inspect(msg.fields[1].deprecated, content="true")
+      _ => fail("schema should contain a message")
+    }
+    Err(_) => fail("schema should parse deprecated field marker")
+  }
+}
+
+test "compatibility allows newly deprecated field" {
+  let old_text = "package demo\nmessage Save { 1: id String 2: score Int }\n"
+  let new_text = "package demo\nmessage Save { 1: id String 2: score Int deprecated }\n"
+  match (parse_schema(old_text), parse_schema(new_text)) {
+    (Ok(old_schema), Ok(new_schema)) => match check_compatible(old_schema, new_schema) {
+      Ok(_) => ()
+      Err(_) => fail("schema should allow adding deprecated marker")
+    }
+    _ => fail("schemas should parse")
+  }
+}
+
+test "compatibility rejects deprecated marker removal" {
+  let old_text = "package demo\nmessage Save { 1: id String 2: score Int deprecated }\n"
+  let new_text = "package demo\nmessage Save { 1: id String 2: score Int }\n"
+  match (parse_schema(old_text), parse_schema(new_text)) {
+    (Ok(old_schema), Ok(new_schema)) => match check_compatible(old_schema, new_schema) {
+      Ok(_) => fail("schema should reject deprecated marker removal")
+      Err(_) => ()
+    }
+    _ => fail("schemas should parse")
+  }
+}

@@ -13,8 +13,10 @@ types and encoders without pulling in a large compatibility surface.
 - Generated MoonBit structs, enums, defaults, sample fixtures, encode/decode,
   equality helpers, enum mappings, and value round-trip tests.
 - Supports scalar fields, optional fields, `List[T]`, enums, nested messages,
-  reserved field/tag numbers, and reserved ranges such as `reserved 10..20`.
-- Includes schema compatibility checks for safe version evolution.
+  reserved field/tag numbers, reserved ranges such as `reserved 10..20`, and
+  field-level `deprecated` markers.
+- Includes schema compatibility checks and Markdown schema documentation for
+  safe version evolution.
 - Designed as reusable infrastructure for tools, games, caches, and data
   exchange in the MoonBit ecosystem.
 
@@ -70,7 +72,8 @@ enum UserStatus {
 ```text
 moonpack check examples/auth/auth.mpack
 moonpack compat examples/compat/savegame_v1.mpack examples/compat/savegame_v2.mpack
-moonpack gen examples/auth/auth.mpack -o generated
+moonpack gen examples/auth/auth.mpack -o generated [--no-tests]
+moonpack doc examples/savegame/savegame.mpack -o docs/generated
 ```
 
 From this workspace:
@@ -81,6 +84,7 @@ $env:MOON_HOME='D:\moonbit\.moonhome'
 moon run src/cli -- check examples/auth/auth.mpack
 moon run src/cli -- compat examples/compat/savegame_v1.mpack examples/compat/savegame_v2.mpack
 moon run src/cli -- gen examples/savegame/savegame.mpack -o generated
+moon run src/cli -- doc examples/savegame/savegame.mpack -o docs/generated
 moon check
 moon test
 ```
@@ -100,8 +104,9 @@ Example output:
 ```text
 ok: demo.auth
 ok: compatible
-generated: generated/demo/savegame
-Total tests: 14, passed: 14, failed: 0.
+generated: generated/demo/savegame (7 files)
+documented: docs/generated/demo/savegame.md
+Total tests: 17, passed: 17, failed: 0.
 error: examples/invalid/reserved.mpack:5:3: field number 1 is reserved in message User
 error: compat failed: message Save removed field 2 without reserving it
 ```
@@ -130,20 +135,25 @@ flowchart LR
 
 - Primitive types: `Bool`, `Int`, `Int64`, `Double`, `String`, `Bytes`.
 - Compound types: `message`, `enum`, `List[T]`, optional `T?`.
+- Evolution markers: `deprecated`, `reserved <n>`, and `reserved <start>..<end>`.
 - Wire types: varint, fixed64, length-delimited.
 - Unknown field skipping for forward compatibility.
 - Schema parser and validation.
 - MoonBit source generation for default values, enum mappings, encode/decode,
 - equality helpers, and value round-trip tests.
 - Compatibility checks between old and new schema files.
+- Markdown schema docs through `moonpack doc`.
 
 ## Current Verification
 
 - `moon check`: passing.
-- `moon test`: passing with 14 tests, including generated value round-trip tests.
+- `moon test`: passing with 17 tests, including generated value round-trip tests.
 
 The generated MVP supports scalar fields, optional fields, repeated fields via
 `List[T]`, enums, nested messages, and Double via fixed64.
+
+Schema evolution supports marking fields as deprecated before reserving and
+removing their field numbers in later versions.
 
 ## Demo
 

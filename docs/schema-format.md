@@ -51,6 +51,23 @@ message User {
 If a later field reuses a reserved number, MoonPack reports a path, line, and
 column in the CLI.
 
+## Deprecated Fields
+
+Use `deprecated` after a field type to mark a field as intentionally kept for
+compatibility while discouraging new use.
+
+```text
+message Save {
+  1: id String
+  2: old_score Int deprecated
+}
+```
+
+Deprecated fields still generate normal encode/decode code. The marker is used
+by compatibility checks and documentation so schema evolution can follow a clear
+path: mark a field deprecated, reserve its number in a later version, then
+remove it.
+
 ## Types
 
 Built-in types:

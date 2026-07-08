@@ -1,7 +1,15 @@
 $ErrorActionPreference = "Stop"
 
 $root = Split-Path -Parent $PSScriptRoot
-$env:MOON_HOME = Join-Path $root ".moonhome"
+$localMoonHome = Join-Path $root ".moonhome"
+$parentMoonHome = Join-Path (Split-Path -Parent $root) ".moonhome"
+if (Test-Path $localMoonHome) {
+  $env:MOON_HOME = $localMoonHome
+} elseif (Test-Path $parentMoonHome) {
+  $env:MOON_HOME = $parentMoonHome
+} else {
+  throw "MoonBit toolchain not found. Expected .moonhome under project root or parent directory."
+}
 $env:PATH = (Join-Path $env:MOON_HOME "bin") + ";" + $env:PATH
 
 moon version --all
@@ -11,6 +19,7 @@ moon run src/cli -- check examples/auth/auth.mpack
 moon run src/cli -- check examples/savegame/savegame.mpack
 moon run src/cli -- compat examples/compat/savegame_v1.mpack examples/compat/savegame_v2.mpack
 moon run src/cli -- gen examples/savegame/savegame.mpack -o generated
+moon run src/cli -- doc examples/savegame/savegame.mpack -o docs/generated
 moon check
 moon test
 

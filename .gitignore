@@ -1,18 +1,21 @@
-# MoonBit 工具链安装/下载
+# Local MoonBit toolchain and downloads
 .downloads/
 .install-home/
 .toolchains/
 .moonhome/
 
-# 第三方依赖缓存
+# Dependency and build caches
 .mooncakes/
-
-# 构建产物
-_build/
-
-# 诊断文件
-trace.json
-
-# 其他
 .repos/
+_build/
+node_modules/
+
+# Local diagnostics and scratch files
+trace.json
 .scratch/
+
+# Editor and OS files
+.DS_Store
+Thumbs.db
+*.tmp
+*.log

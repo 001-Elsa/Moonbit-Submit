@@ -83,9 +83,11 @@ Current generated-code coverage:
 - Unknown field skipping.
 - Reserved field/tag number checks with path, line, and column CLI errors.
 - Stable snake_case generated API names.
+- Field-level `deprecated` markers for schema evolution.
+- Markdown schema documentation through `moonpack doc <schema.mpack> -o <dir>`.
 
 ## Next Implementation Pass
 
-1. Broaden compatibility rules for explicit deprecated fields.
+1. Add JSON bridge helpers for generated demo types.
 2. Add richer generated API customization options.
-3. Add more demos and screenshots for contest presentation.
+3. Add benchmark scripts and more contest presentation assets.

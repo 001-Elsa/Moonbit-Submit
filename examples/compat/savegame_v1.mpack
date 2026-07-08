@@ -2,7 +2,7 @@ package demo.compat
 
 message Save {
   1: id String
-  2: score Int
+  2: score Int deprecated
 }
 
 enum State {

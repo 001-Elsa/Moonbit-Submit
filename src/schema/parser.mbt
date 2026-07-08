@@ -173,7 +173,14 @@ fn parse_field(p : Parser) -> Result[FieldDecl, ParseError] {
                 }
                 _ => false
               }
-              Ok({ number, name, ty, optional, line: number_token.line, column: number_token.column })
+              let deprecated = match current(p).kind {
+                KeywordDeprecated => {
+                  ignore(advance(p))
+                  true
+                }
+                _ => false
+              }
+              Ok({ number, name, ty, optional, deprecated, line: number_token.line, column: number_token.column })
             }
           }
         }

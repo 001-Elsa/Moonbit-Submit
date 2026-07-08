@@ -66,6 +66,9 @@ fn check_message_compatible(old_msg : MessageDecl, new_msg : MessageDecl) -> Res
         if field_shape(old_field) != field_shape(new_field) {
           return Err("message " + old_msg.name + " field " + old_field.number.to_string() + " changed type from " + field_shape(old_field) + " to " + field_shape(new_field))
         }
+        if old_field.deprecated && !new_field.deprecated {
+          return Err("message " + old_msg.name + " field " + old_field.number.to_string() + " removed deprecated marker")
+        }
       }
       None =>
         if !compat_contains_int(new_msg.reserved_numbers, old_field.number) {

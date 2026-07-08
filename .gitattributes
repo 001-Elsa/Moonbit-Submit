@@ -1,0 +1,8 @@
+* text=auto eol=lf
+
+*.ps1 text eol=lf
+*.mbt text eol=lf
+*.mpack text eol=lf
+*.md text eol=lf
+moon.pkg text eol=lf
+moon.mod text eol=lf
