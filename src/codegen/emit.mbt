@@ -176,7 +176,18 @@ fn emit_value_equal_guard(
   match ty {
     @schema.NamedType(name) =>
       if is_enum(schema, name) {
-        writer.line("if " + lhs + " != " + rhs + " {")
+        let lower = snake_name(name)
+        writer.line(
+          "if " +
+          lower +
+          "_to_int(" +
+          lhs +
+          ") != " +
+          lower +
+          "_to_int(" +
+          rhs +
+          ") {",
+        )
       } else {
         writer.line(
           "if !equal_" + snake_name(name) + "(" + lhs + ", " + rhs + ") {",
