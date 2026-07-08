@@ -51,14 +51,14 @@ them, generate MoonBit code, and run generated round-trip tests.
 
 - GitHub repository: https://github.com/001-Elsa/Moonbit-Submit
 - Gitlink repository: https://gitlink.org.cn/Hanzzz/MoonPack_Hz
-- Mooncakes package: `001-Elsa/moonpack@0.1.0`
+- Mooncakes package: `001-Elsa/moonpack@0.1.1`
 - CI command set: `moon check` and `moon test`
 - Local verification script: `powershell -ExecutionPolicy Bypass -File .\scripts\check.ps1`
 
 Fetch the published package with:
 
 ```powershell
-moon fetch 001-Elsa/moonpack@0.1.0
+moon fetch 001-Elsa/moonpack@0.1.1
 ```
 
 ## Example Schema

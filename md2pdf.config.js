@@ -1,5 +1,5 @@
 module.exports = {
-  dest: "项目申报书.pdf",
+  dest: "MoonPack项目申报书.pdf",
   launch_options: {
     executablePath: "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
   },
@@ -8,61 +8,5 @@ module.exports = {
     margin: { top: "20mm", bottom: "20mm", left: "22mm", right: "22mm" },
     printBackground: true,
   },
-  stylesheet: `
-    body {
-      font-family: "Microsoft YaHei", "SimSun", "PingFang SC", sans-serif;
-      font-size: 11pt;
-      line-height: 1.55;
-      color: #222;
-    }
-    h1 {
-      font-size: 15pt;
-      text-align: center;
-      margin-bottom: 12px;
-      padding-bottom: 0;
-    }
-    h2 {
-      font-size: 12pt;
-      margin-top: 14px;
-      margin-bottom: 6px;
-      padding-bottom: 3px;
-      border-bottom: 1.5px solid #666;
-    }
-    p { margin: 4px 0; }
-    ul, ol { margin: 2px 0; padding-left: 1.3em; }
-    li { margin: 2px 0; }
-    code {
-      font-family: "Consolas", "Courier New", monospace;
-      font-size: 9.5pt;
-      background: #f0f0f0;
-      padding: 1px 4px;
-      border-radius: 2px;
-    }
-    pre {
-      background: #f6f6f6;
-      padding: 10px 12px;
-      border-left: 3px solid #999;
-      font-size: 9pt;
-      overflow-x: auto;
-      margin: 6px 0;
-    }
-    pre code {
-      background: none;
-      padding: 0;
-    }
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      margin: 8px 0;
-      font-size: 10.5pt;
-    }
-    th, td {
-      border: 1px solid #666;
-      padding: 4px 10px;
-      text-align: left;
-    }
-    th { background: #e8e8e8; font-weight: bold; }
-    strong { color: #111; }
-    hr { border: none; border-top: 1px solid #ddd; margin: 10px 0; }
-  `,
+  stylesheet: "proposal.css",
 };
