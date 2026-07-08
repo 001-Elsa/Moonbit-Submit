@@ -1,3 +1,4 @@
+///|
 fn print_usage() -> Unit {
   println("MoonPack")
   println("")
@@ -8,22 +9,26 @@ fn print_usage() -> Unit {
   println("  moonpack doc <schema.mpack> -o <dir>")
 }
 
+///|
 fn[T] fail(message : String) -> T {
   println("error: " + message)
   @sys.exit(1)
   abort(message)
 }
 
+///|
 fn parse_and_validate(path : String, text : String) -> @schema.Schema {
   match @schema.parse_schema(text) {
     Err(err) => fail(path + ":" + @schema.parse_error_to_string(err))
-    Ok(schema) => match @schema.validate_schema(schema) {
-      Err(err) => fail(path + ":" + @schema.parse_error_to_string(err))
-      Ok(_) => schema
-    }
+    Ok(schema) =>
+      match @schema.validate_schema(schema) {
+        Err(err) => fail(path + ":" + @schema.parse_error_to_string(err))
+        Ok(_) => schema
+      }
   }
 }
 
+///|
 fn read_schema(path : String) -> @schema.Schema {
   let text = @fs.read_file_to_string(path) catch {
     _ => fail("cannot read schema file '\{path}'")
@@ -31,6 +36,7 @@ fn read_schema(path : String) -> @schema.Schema {
   parse_and_validate(path, text)
 }
 
+///|
 fn ensure_dir(path : String) -> Unit {
   if !@fs.path_exists(path) {
     @fs.create_dir(path) catch {
@@ -39,6 +45,7 @@ fn ensure_dir(path : String) -> Unit {
   }
 }
 
+///|
 fn package_parts(package_name : String) -> Array[String] {
   let parts : Array[String] = []
   let mut start = 0
@@ -54,6 +61,7 @@ fn package_parts(package_name : String) -> Array[String] {
   parts
 }
 
+///|
 fn package_output_dir(out_dir : String, package_name : String) -> String {
   ensure_dir(out_dir)
   let parts = package_parts(package_name)
@@ -65,6 +73,7 @@ fn package_output_dir(out_dir : String, package_name : String) -> String {
   current
 }
 
+///|
 fn package_doc_path(out_dir : String, package_name : String) -> String {
   ensure_dir(out_dir)
   let parts = package_parts(package_name)
@@ -78,11 +87,13 @@ fn package_doc_path(out_dir : String, package_name : String) -> String {
   current + "/" + parts[parts.length() - 1] + ".md"
 }
 
+///|
 fn command_check(path : String) -> Unit {
   let schema = read_schema(path)
   println("ok: " + schema.package_name)
 }
 
+///|
 fn command_compat(old_path : String, new_path : String) -> Unit {
   let old_schema = read_schema(old_path)
   let new_schema = read_schema(new_path)
@@ -92,6 +103,7 @@ fn command_compat(old_path : String, new_path : String) -> Unit {
   }
 }
 
+///|
 fn command_gen(path : String, out_dir : String, write_tests : Bool) -> Unit {
   let schema = read_schema(path)
   let package_dir = package_output_dir(out_dir, schema.package_name)
@@ -112,7 +124,7 @@ fn command_gen(path : String, out_dir : String, write_tests : Bool) -> Unit {
       count = count + 1
     }
   }
-  let pkg = "import {\n  \"local/moonpack/src/core\" @core\n}\n"
+  let pkg = "import {\n  \"001-Elsa/moonpack/src/core\" @core\n}\n"
   @fs.write_string_to_file(package_dir + "/moon.pkg", pkg) catch {
     _ => fail("cannot write generated package file")
   }
@@ -120,6 +132,7 @@ fn command_gen(path : String, out_dir : String, write_tests : Bool) -> Unit {
   println("generated: " + package_dir + " (" + count.to_string() + " files)")
 }
 
+///|
 fn command_doc(path : String, out_dir : String) -> Unit {
   let schema = read_schema(path)
   let output = package_doc_path(out_dir, schema.package_name)
@@ -129,6 +142,7 @@ fn command_doc(path : String, out_dir : String) -> Unit {
   println("documented: " + output)
 }
 
+///|
 fn main {
   let args = @sys.get_cli_args()
   if args.length() < 2 || args[1] == "--help" || args[1] == "-h" {

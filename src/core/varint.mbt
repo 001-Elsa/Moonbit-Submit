@@ -1,3 +1,4 @@
+///|
 pub fn write_varint(writer : Writer, value : Int64) -> Unit {
   let mut n = value
   while n >= 0x80L {
@@ -8,6 +9,7 @@ pub fn write_varint(writer : Writer, value : Int64) -> Unit {
   writer.write_byte(n.to_byte())
 }
 
+///|
 pub fn read_varint(reader : Reader) -> Result[Int64, DecodeError] {
   let mut shift = 0
   let mut result = 0L
@@ -27,6 +29,7 @@ pub fn read_varint(reader : Reader) -> Result[Int64, DecodeError] {
   Err(MalformedVarint)
 }
 
+///|
 pub fn encoded_varint_len(value : Int64) -> Int {
   let mut n = value
   let mut len = 1

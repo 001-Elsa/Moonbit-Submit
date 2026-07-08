@@ -1,8 +1,8 @@
 import {
-  "local/moonpack/src/schema" @schema,
-  "local/moonpack/src/codegen" @codegen,
-  "moonbitlang/x/fs" @fs,
-  "moonbitlang/x/sys" @sys,
+  "001-Elsa/moonpack/src/schema",
+  "001-Elsa/moonpack/src/codegen",
+  "moonbitlang/x/fs",
+  "moonbitlang/x/sys",
 }
 
 options(

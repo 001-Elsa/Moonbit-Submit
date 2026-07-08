@@ -1,16 +1,15 @@
+///|
 fn find_enum(schema : @schema.Schema, name : String) -> @schema.EnumDecl? {
   for decl in schema.declarations {
     match decl {
-      @schema.Enum(en) =>
-        if en.name == name {
-          return Some(en)
-        }
+      @schema.Enum(en) => if en.name == name { return Some(en) }
       _ => ()
     }
   }
   None
 }
 
+///|
 fn is_enum(schema : @schema.Schema, name : String) -> Bool {
   match find_enum(schema, name) {
     Some(_) => true
@@ -18,7 +17,12 @@ fn is_enum(schema : @schema.Schema, name : String) -> Bool {
   }
 }
 
-fn default_expr(schema : @schema.Schema, ty : @schema.TypeRef, optional : Bool) -> String {
+///|
+fn default_expr(
+  schema : @schema.Schema,
+  ty : @schema.TypeRef,
+  optional : Bool,
+) -> String {
   if optional {
     "None"
   } else {
@@ -44,7 +48,13 @@ fn default_expr(schema : @schema.Schema, ty : @schema.TypeRef, optional : Bool) 
   }
 }
 
-fn sample_expr(schema : @schema.Schema, ty : @schema.TypeRef, optional : Bool, field_name : String) -> String {
+///|
+fn sample_expr(
+  schema : @schema.Schema,
+  ty : @schema.TypeRef,
+  optional : Bool,
+  field_name : String,
+) -> String {
   if optional {
     match ty {
       @schema.StringType => "Some(\"sample_" + field_name + "\")"
@@ -79,7 +89,8 @@ fn sample_expr(schema : @schema.Schema, ty : @schema.TypeRef, optional : Bool, f
       @schema.DoubleType => "3.5"
       @schema.StringType => "\"sample_" + field_name + "\""
       @schema.BytesType => "[b'a', b'b']"
-      @schema.ListType(inner) => "[" + sample_expr(schema, inner, false, field_name) + "]"
+      @schema.ListType(inner) =>
+        "[" + sample_expr(schema, inner, false, field_name) + "]"
       @schema.NamedType(name) =>
         if is_enum(schema, name) {
           match find_enum(schema, name) {
@@ -100,6 +111,7 @@ fn sample_expr(schema : @schema.Schema, ty : @schema.TypeRef, optional : Bool, f
   }
 }
 
+///|
 fn emit_enum(writer : SourceWriter, en : @schema.EnumDecl) -> Unit {
   writer.line("pub enum " + en.name + " {")
   writer.push_indent()
@@ -139,17 +151,21 @@ fn emit_enum(writer : SourceWriter, en : @schema.EnumDecl) -> Unit {
   writer.blank()
 }
 
+///|
 fn emit_struct(writer : SourceWriter, msg : @schema.MessageDecl) -> Unit {
   writer.line("pub struct " + msg.name + " {")
   writer.push_indent()
   for field in msg.fields {
-    writer.line(field.name + " : " + moonbit_type_name(field.ty, field.optional))
+    writer.line(
+      field.name + " : " + moonbit_type_name(field.ty, field.optional),
+    )
   }
   writer.pop_indent()
   writer.line("}")
   writer.blank()
 }
 
+///|
 fn emit_value_equal_guard(
   writer : SourceWriter,
   schema : @schema.Schema,
@@ -162,7 +178,9 @@ fn emit_value_equal_guard(
       if is_enum(schema, name) {
         writer.line("if " + lhs + " != " + rhs + " {")
       } else {
-        writer.line("if !equal_" + snake_name(name) + "(" + lhs + ", " + rhs + ") {")
+        writer.line(
+          "if !equal_" + snake_name(name) + "(" + lhs + ", " + rhs + ") {",
+        )
       }
     _ => writer.line("if " + lhs + " != " + rhs + " {")
   }
@@ -172,13 +190,16 @@ fn emit_value_equal_guard(
   writer.line("}")
 }
 
+///|
 fn emit_list_equal_guard(
   writer : SourceWriter,
   schema : @schema.Schema,
   field : @schema.FieldDecl,
   inner : @schema.TypeRef,
 ) -> Unit {
-  writer.line("if lhs." + field.name + ".length() != rhs." + field.name + ".length() {")
+  writer.line(
+    "if lhs." + field.name + ".length() != rhs." + field.name + ".length() {",
+  )
   writer.push_indent()
   writer.line("return false")
   writer.pop_indent()
@@ -199,6 +220,7 @@ fn emit_list_equal_guard(
   writer.line("}")
 }
 
+///|
 fn emit_optional_equal_guard(
   writer : SourceWriter,
   schema : @schema.Schema,
@@ -226,18 +248,38 @@ fn emit_optional_equal_guard(
   writer.line("}")
 }
 
-fn emit_equal_fn(writer : SourceWriter, schema : @schema.Schema, msg : @schema.MessageDecl) -> Unit {
+///|
+fn emit_equal_fn(
+  writer : SourceWriter,
+  schema : @schema.Schema,
+  msg : @schema.MessageDecl,
+) -> Unit {
   let lower = snake_name(msg.name)
-  writer.line("pub fn equal_" + lower + "(lhs : " + msg.name + ", rhs : " + msg.name + ") -> Bool {")
+  writer.line(
+    "pub fn equal_" +
+    lower +
+    "(lhs : " +
+    msg.name +
+    ", rhs : " +
+    msg.name +
+    ") -> Bool {",
+  )
   writer.push_indent()
   for field in msg.fields {
     match field.ty {
-      @schema.ListType(inner) => emit_list_equal_guard(writer, schema, field, inner)
+      @schema.ListType(inner) =>
+        emit_list_equal_guard(writer, schema, field, inner)
       _ =>
         if field.optional {
           emit_optional_equal_guard(writer, schema, field)
         } else {
-          emit_value_equal_guard(writer, schema, field.ty, "lhs." + field.name, "rhs." + field.name)
+          emit_value_equal_guard(
+            writer,
+            schema,
+            field.ty,
+            "lhs." + field.name,
+            "rhs." + field.name,
+          )
         }
     }
   }
@@ -247,29 +289,80 @@ fn emit_equal_fn(writer : SourceWriter, schema : @schema.Schema, msg : @schema.M
   writer.blank()
 }
 
-fn encode_call(schema : @schema.Schema, number : Int, ty : @schema.TypeRef, expr : String) -> String {
+///|
+fn encode_call(
+  schema : @schema.Schema,
+  number : Int,
+  ty : @schema.TypeRef,
+  expr : String,
+) -> String {
   match ty {
-    @schema.BoolType => "@core.write_bool_field(writer, " + number.to_string() + ", " + expr + ")"
-    @schema.IntType => "@core.write_int_field(writer, " + number.to_string() + ", " + expr + ")"
-    @schema.Int64Type => "@core.write_int64_field(writer, " + number.to_string() + ", " + expr + ")"
-    @schema.DoubleType => "@core.write_double_field(writer, " + number.to_string() + ", " + expr + ")"
-    @schema.StringType => "@core.write_string_field(writer, " + number.to_string() + ", " + expr + ")"
-    @schema.BytesType => "@core.write_bytes_field(writer, " + number.to_string() + ", " + expr + ")"
+    @schema.BoolType =>
+      "@core.write_bool_field(writer, " + number.to_string() + ", " + expr + ")"
+    @schema.IntType =>
+      "@core.write_int_field(writer, " + number.to_string() + ", " + expr + ")"
+    @schema.Int64Type =>
+      "@core.write_int64_field(writer, " +
+      number.to_string() +
+      ", " +
+      expr +
+      ")"
+    @schema.DoubleType =>
+      "@core.write_double_field(writer, " +
+      number.to_string() +
+      ", " +
+      expr +
+      ")"
+    @schema.StringType =>
+      "@core.write_string_field(writer, " +
+      number.to_string() +
+      ", " +
+      expr +
+      ")"
+    @schema.BytesType =>
+      "@core.write_bytes_field(writer, " +
+      number.to_string() +
+      ", " +
+      expr +
+      ")"
     @schema.NamedType(name) =>
       if is_enum(schema, name) {
-        "@core.write_int_field(writer, " + number.to_string() + ", " + snake_name(name) + "_to_int(" + expr + "))"
+        "@core.write_int_field(writer, " +
+        number.to_string() +
+        ", " +
+        snake_name(name) +
+        "_to_int(" +
+        expr +
+        "))"
       } else {
-        "@core.write_message_field(writer, " + number.to_string() + ", encode_" + snake_name(name) + "(" + expr + "))"
+        "@core.write_message_field(writer, " +
+        number.to_string() +
+        ", encode_" +
+        snake_name(name) +
+        "(" +
+        expr +
+        "))"
       }
     @schema.ListType(_) => abort("list encode should use inner type")
   }
 }
 
-fn encode_inner_call(schema : @schema.Schema, number : Int, ty : @schema.TypeRef, expr : String) -> String {
+///|
+fn encode_inner_call(
+  schema : @schema.Schema,
+  number : Int,
+  ty : @schema.TypeRef,
+  expr : String,
+) -> String {
   encode_call(schema, number, ty, expr)
 }
 
-fn emit_encode_field(writer : SourceWriter, schema : @schema.Schema, field : @schema.FieldDecl) -> Unit {
+///|
+fn emit_encode_field(
+  writer : SourceWriter,
+  schema : @schema.Schema,
+  field : @schema.FieldDecl,
+) -> Unit {
   match field.ty {
     @schema.ListType(inner) => {
       writer.line("for item in value." + field.name + " {")
@@ -282,16 +375,21 @@ fn emit_encode_field(writer : SourceWriter, schema : @schema.Schema, field : @sc
       if field.optional {
         writer.line("match value." + field.name + " {")
         writer.push_indent()
-        writer.line("Some(v) => " + encode_call(schema, field.number, field.ty, "v"))
+        writer.line(
+          "Some(v) => " + encode_call(schema, field.number, field.ty, "v"),
+        )
         writer.line("None => ()")
         writer.pop_indent()
         writer.line("}")
       } else {
-        writer.line(encode_call(schema, field.number, field.ty, "value." + field.name))
+        writer.line(
+          encode_call(schema, field.number, field.ty, "value." + field.name),
+        )
       }
   }
 }
 
+///|
 fn decode_value_call(schema : @schema.Schema, ty : @schema.TypeRef) -> String {
   match ty {
     @schema.BoolType => "@core.read_bool_value(reader, key.wire_type)"
@@ -310,6 +408,7 @@ fn decode_value_call(schema : @schema.Schema, ty : @schema.TypeRef) -> String {
   }
 }
 
+///|
 fn emit_decode_assign(
   writer : SourceWriter,
   schema : @schema.Schema,
@@ -322,9 +421,13 @@ fn emit_decode_assign(
   match ty {
     @schema.NamedType(name) =>
       if is_enum(schema, name) {
-        writer.line("Ok(v) => " + target + " = " + snake_name(name) + "_from_int(v)")
+        writer.line(
+          "Ok(v) => " + target + " = " + snake_name(name) + "_from_int(v)",
+        )
       } else {
-        writer.line("Ok(bytes) => match decode_" + snake_name(name) + "(bytes) {")
+        writer.line(
+          "Ok(bytes) => match decode_" + snake_name(name) + "(bytes) {",
+        )
         writer.push_indent()
         writer.line("Ok(v) => " + target + " = v")
         writer.line("Err(err) => return Err(err)")
@@ -337,7 +440,12 @@ fn emit_decode_assign(
   writer.line("}")
 }
 
-fn emit_decode_field(writer : SourceWriter, schema : @schema.Schema, field : @schema.FieldDecl) -> Unit {
+///|
+fn emit_decode_field(
+  writer : SourceWriter,
+  schema : @schema.Schema,
+  field : @schema.FieldDecl,
+) -> Unit {
   match field.ty {
     @schema.ListType(inner) => {
       writer.line("match " + decode_value_call(schema, inner) + " {")
@@ -346,9 +454,17 @@ fn emit_decode_field(writer : SourceWriter, schema : @schema.Schema, field : @sc
       match inner {
         @schema.NamedType(name) =>
           if is_enum(schema, name) {
-            writer.line("Ok(v) => " + field.name + ".push(" + snake_name(name) + "_from_int(v))")
+            writer.line(
+              "Ok(v) => " +
+              field.name +
+              ".push(" +
+              snake_name(name) +
+              "_from_int(v))",
+            )
           } else {
-            writer.line("Ok(bytes) => match decode_" + snake_name(name) + "(bytes) {")
+            writer.line(
+              "Ok(bytes) => match decode_" + snake_name(name) + "(bytes) {",
+            )
             writer.push_indent()
             writer.line("Ok(v) => " + field.name + ".push(v)")
             writer.line("Err(err) => return Err(err)")
@@ -368,9 +484,17 @@ fn emit_decode_field(writer : SourceWriter, schema : @schema.Schema, field : @sc
         match field.ty {
           @schema.NamedType(name) =>
             if is_enum(schema, name) {
-              writer.line("Ok(v) => " + field.name + " = Some(" + snake_name(name) + "_from_int(v))")
+              writer.line(
+                "Ok(v) => " +
+                field.name +
+                " = Some(" +
+                snake_name(name) +
+                "_from_int(v))",
+              )
             } else {
-              writer.line("Ok(bytes) => match decode_" + snake_name(name) + "(bytes) {")
+              writer.line(
+                "Ok(bytes) => match decode_" + snake_name(name) + "(bytes) {",
+              )
               writer.push_indent()
               writer.line("Ok(v) => " + field.name + " = Some(v)")
               writer.line("Err(err) => return Err(err)")
@@ -387,14 +511,21 @@ fn emit_decode_field(writer : SourceWriter, schema : @schema.Schema, field : @sc
   }
 }
 
-fn emit_message_codec(writer : SourceWriter, schema : @schema.Schema, msg : @schema.MessageDecl) -> Unit {
+///|
+fn emit_message_codec(
+  writer : SourceWriter,
+  schema : @schema.Schema,
+  msg : @schema.MessageDecl,
+) -> Unit {
   let lower = snake_name(msg.name)
   writer.line("pub fn default_" + lower + "() -> " + msg.name + " {")
   writer.push_indent()
   writer.line("{")
   writer.push_indent()
   for field in msg.fields {
-    writer.line(field.name + ": " + default_expr(schema, field.ty, field.optional) + ",")
+    writer.line(
+      field.name + ": " + default_expr(schema, field.ty, field.optional) + ",",
+    )
   }
   writer.pop_indent()
   writer.line("}")
@@ -406,7 +537,12 @@ fn emit_message_codec(writer : SourceWriter, schema : @schema.Schema, msg : @sch
   writer.line("{")
   writer.push_indent()
   for field in msg.fields {
-    writer.line(field.name + ": " + sample_expr(schema, field.ty, field.optional, field.name) + ",")
+    writer.line(
+      field.name +
+      ": " +
+      sample_expr(schema, field.ty, field.optional, field.name) +
+      ",",
+    )
   }
   writer.pop_indent()
   writer.line("}")
@@ -414,7 +550,9 @@ fn emit_message_codec(writer : SourceWriter, schema : @schema.Schema, msg : @sch
   writer.line("}")
   writer.blank()
   emit_equal_fn(writer, schema, msg)
-  writer.line("pub fn encode_" + lower + "(value : " + msg.name + ") -> Array[Byte] {")
+  writer.line(
+    "pub fn encode_" + lower + "(value : " + msg.name + ") -> Array[Byte] {",
+  )
   writer.push_indent()
   writer.line("let writer = @core.Writer::new()")
   for field in msg.fields {
@@ -424,7 +562,13 @@ fn emit_message_codec(writer : SourceWriter, schema : @schema.Schema, msg : @sch
   writer.pop_indent()
   writer.line("}")
   writer.blank()
-  writer.line("pub fn decode_" + lower + "(input : Array[Byte]) -> Result[" + msg.name + ", @core.DecodeError] {")
+  writer.line(
+    "pub fn decode_" +
+    lower +
+    "(input : Array[Byte]) -> Result[" +
+    msg.name +
+    ", @core.DecodeError] {",
+  )
   writer.push_indent()
   writer.line("let reader = @core.Reader::new(input)")
   for field in msg.fields {
@@ -432,7 +576,14 @@ fn emit_message_codec(writer : SourceWriter, schema : @schema.Schema, msg : @sch
       @schema.ListType(_) => "let "
       _ => "let mut "
     }
-    writer.line(binding + field.name + " : " + moonbit_type_name(field.ty, field.optional) + " = " + default_expr(schema, field.ty, field.optional))
+    writer.line(
+      binding +
+      field.name +
+      " : " +
+      moonbit_type_name(field.ty, field.optional) +
+      " = " +
+      default_expr(schema, field.ty, field.optional),
+    )
   }
   writer.line("while !reader.is_empty() {")
   writer.push_indent()
@@ -472,12 +623,16 @@ fn emit_message_codec(writer : SourceWriter, schema : @schema.Schema, msg : @sch
   writer.blank()
 }
 
+///|
 fn emit_header(writer : SourceWriter) -> Unit {
   writer.line("// Generated by MoonPack. Do not edit by hand.")
-  writer.line("// Package importing this file should import local/moonpack/src/core as @core.")
+  writer.line(
+    "// Package importing this file should import 001-Elsa/moonpack/src/core as @core.",
+  )
   writer.blank()
 }
 
+///|
 fn yes_no(value : Bool) -> String {
   if value {
     "yes"
@@ -486,11 +641,13 @@ fn yes_no(value : Bool) -> String {
   }
 }
 
+///|
 fn field_type_display(field : @schema.FieldDecl) -> String {
   let suffix = if field.optional { "?" } else { "" }
   field.ty.display() + suffix
 }
 
+///|
 fn emit_reserved_doc(writer : SourceWriter, numbers : Array[Int]) -> Unit {
   if numbers.length() == 0 {
     writer.line("- Reserved: none")
@@ -508,6 +665,7 @@ fn emit_reserved_doc(writer : SourceWriter, numbers : Array[Int]) -> Unit {
   }
 }
 
+///|
 fn emit_message_doc(writer : SourceWriter, msg : @schema.MessageDecl) -> Unit {
   writer.line("## Message `" + msg.name + "`")
   writer.blank()
@@ -517,15 +675,21 @@ fn emit_message_doc(writer : SourceWriter, msg : @schema.MessageDecl) -> Unit {
   writer.line("| --- | --- | --- | --- |")
   for field in msg.fields {
     writer.line(
-      "| " + field.number.to_string() +
-      " | `" + field.name +
-      "` | `" + field_type_display(field) +
-      "` | " + yes_no(field.deprecated) + " |",
+      "| " +
+      field.number.to_string() +
+      " | `" +
+      field.name +
+      "` | `" +
+      field_type_display(field) +
+      "` | " +
+      yes_no(field.deprecated) +
+      " |",
     )
   }
   writer.blank()
 }
 
+///|
 fn emit_enum_doc(writer : SourceWriter, en : @schema.EnumDecl) -> Unit {
   writer.line("## Enum `" + en.name + "`")
   writer.blank()
@@ -539,6 +703,7 @@ fn emit_enum_doc(writer : SourceWriter, en : @schema.EnumDecl) -> Unit {
   writer.blank()
 }
 
+///|
 pub fn decl_file_stem(decl : @schema.Decl) -> String {
   match decl {
     @schema.Message(msg) => snake_name(msg.name)
@@ -546,6 +711,7 @@ pub fn decl_file_stem(decl : @schema.Decl) -> String {
   }
 }
 
+///|
 pub fn emit_decl(schema : @schema.Schema, decl : @schema.Decl) -> String {
   let writer = SourceWriter::new()
   emit_header(writer)
@@ -559,6 +725,7 @@ pub fn emit_decl(schema : @schema.Schema, decl : @schema.Decl) -> String {
   writer.finish()
 }
 
+///|
 pub fn emit_schema(schema : @schema.Schema) -> String {
   let writer = SourceWriter::new()
   emit_header(writer)
@@ -580,6 +747,7 @@ pub fn emit_schema(schema : @schema.Schema) -> String {
   writer.finish()
 }
 
+///|
 fn emit_message_tests(writer : SourceWriter, msg : @schema.MessageDecl) -> Unit {
   let lower = snake_name(msg.name)
   writer.line("test \"moonpack " + msg.name + " default roundtrip\" {")
@@ -588,7 +756,11 @@ fn emit_message_tests(writer : SourceWriter, msg : @schema.MessageDecl) -> Unit 
   writer.line("let bytes = encode_" + lower + "(value)")
   writer.line("match decode_" + lower + "(bytes) {")
   writer.push_indent()
-  writer.line("Ok(decoded) => if !equal_" + lower + "(value, decoded) { fail(\"roundtrip value mismatch\") }")
+  writer.line(
+    "Ok(decoded) => if !equal_" +
+    lower +
+    "(value, decoded) { fail(\"roundtrip value mismatch\") }",
+  )
   writer.line("Err(_) => fail(\"roundtrip failed\")")
   writer.pop_indent()
   writer.line("}")
@@ -601,7 +773,11 @@ fn emit_message_tests(writer : SourceWriter, msg : @schema.MessageDecl) -> Unit 
   writer.line("let bytes = encode_" + lower + "(value)")
   writer.line("match decode_" + lower + "(bytes) {")
   writer.push_indent()
-  writer.line("Ok(decoded) => if !equal_" + lower + "(value, decoded) { fail(\"sample roundtrip value mismatch\") }")
+  writer.line(
+    "Ok(decoded) => if !equal_" +
+    lower +
+    "(value, decoded) { fail(\"sample roundtrip value mismatch\") }",
+  )
   writer.line("Err(_) => fail(\"sample roundtrip failed\")")
   writer.pop_indent()
   writer.line("}")
@@ -610,6 +786,7 @@ fn emit_message_tests(writer : SourceWriter, msg : @schema.MessageDecl) -> Unit 
   writer.blank()
 }
 
+///|
 pub fn emit_decl_tests(_schema : @schema.Schema, decl : @schema.Decl) -> String {
   match decl {
     @schema.Enum(_) => return ""
@@ -625,6 +802,7 @@ pub fn emit_decl_tests(_schema : @schema.Schema, decl : @schema.Decl) -> String 
   writer.finish()
 }
 
+///|
 pub fn emit_schema_tests(schema : @schema.Schema) -> String {
   let writer = SourceWriter::new()
   writer.line("// Generated by MoonPack. Do not edit by hand.")
@@ -638,6 +816,7 @@ pub fn emit_schema_tests(schema : @schema.Schema) -> String {
   writer.finish()
 }
 
+///|
 pub fn emit_schema_doc(schema : @schema.Schema) -> String {
   let writer = SourceWriter::new()
   writer.line("# MoonPack Schema: `" + schema.package_name + "`")

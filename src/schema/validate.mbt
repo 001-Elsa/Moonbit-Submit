@@ -1,3 +1,4 @@
+///|
 fn collect_decl_names(schema : Schema) -> Array[String] {
   let names : Array[String] = []
   for decl in schema.declarations {
@@ -9,6 +10,7 @@ fn collect_decl_names(schema : Schema) -> Array[String] {
   names
 }
 
+///|
 fn contains_name(names : Array[String], name : String) -> Bool {
   for item in names {
     if item == name {
@@ -18,6 +20,7 @@ fn contains_name(names : Array[String], name : String) -> Bool {
   false
 }
 
+///|
 fn contains_int(values : Array[Int], value : Int) -> Bool {
   for item in values {
     if item == value {
@@ -27,6 +30,7 @@ fn contains_int(values : Array[Int], value : Int) -> Bool {
   false
 }
 
+///|
 fn validate_type(
   ty : TypeRef,
   names : Array[String],
@@ -34,33 +38,42 @@ fn validate_type(
   column : Int,
 ) -> Result[Unit, ParseError] {
   match ty {
-    NamedType(name) => {
+    NamedType(name) =>
       if contains_name(names, name) {
         Ok(())
       } else {
         Err(UnknownType(name, line, column))
       }
-    }
     ListType(inner) => validate_type(inner, names, line, column)
     _ => Ok(())
   }
 }
 
-fn validate_message(msg : MessageDecl, names : Array[String]) -> Result[Unit, ParseError] {
+///|
+fn validate_message(
+  msg : MessageDecl,
+  names : Array[String],
+) -> Result[Unit, ParseError] {
   let field_numbers : Array[Int] = []
   let field_names : Array[String] = []
   for field in msg.fields {
     if contains_int(msg.reserved_numbers, field.number) {
-      return Err(ReservedFieldNumber(msg.name, field.number, field.line, field.column))
+      return Err(
+        ReservedFieldNumber(msg.name, field.number, field.line, field.column),
+      )
     }
     for number in field_numbers {
       if number == field.number {
-        return Err(DuplicateFieldNumber(msg.name, field.number, field.line, field.column))
+        return Err(
+          DuplicateFieldNumber(msg.name, field.number, field.line, field.column),
+        )
       }
     }
     for name in field_names {
       if name == field.name {
-        return Err(DuplicateFieldName(msg.name, field.name, field.line, field.column))
+        return Err(
+          DuplicateFieldName(msg.name, field.name, field.line, field.column),
+        )
       }
     }
     field_numbers.push(field.number)
@@ -73,21 +86,28 @@ fn validate_message(msg : MessageDecl, names : Array[String]) -> Result[Unit, Pa
   Ok(())
 }
 
+///|
 fn validate_enum(en : EnumDecl) -> Result[Unit, ParseError] {
   let numbers : Array[Int] = []
   let names : Array[String] = []
   for item in en.cases {
     if contains_int(en.reserved_numbers, item.number) {
-      return Err(ReservedEnumNumber(en.name, item.number, item.line, item.column))
+      return Err(
+        ReservedEnumNumber(en.name, item.number, item.line, item.column),
+      )
     }
     for number in numbers {
       if number == item.number {
-        return Err(DuplicateEnumNumber(en.name, item.number, item.line, item.column))
+        return Err(
+          DuplicateEnumNumber(en.name, item.number, item.line, item.column),
+        )
       }
     }
     for name in names {
       if name == item.name {
-        return Err(DuplicateEnumName(en.name, item.name, item.line, item.column))
+        return Err(
+          DuplicateEnumName(en.name, item.name, item.line, item.column),
+        )
       }
     }
     numbers.push(item.number)
@@ -96,20 +116,22 @@ fn validate_enum(en : EnumDecl) -> Result[Unit, ParseError] {
   Ok(())
 }
 
+///|
 pub fn validate_schema(schema : Schema) -> Result[Unit, ParseError] {
   let names = collect_decl_names(schema)
   for decl in schema.declarations {
     match decl {
-      Message(msg) => match validate_message(msg, names) {
-        Ok(_) => ()
-        Err(err) => return Err(err)
-      }
-      Enum(en) => match validate_enum(en) {
-        Ok(_) => ()
-        Err(err) => return Err(err)
-      }
+      Message(msg) =>
+        match validate_message(msg, names) {
+          Ok(_) => ()
+          Err(err) => return Err(err)
+        }
+      Enum(en) =>
+        match validate_enum(en) {
+          Ok(_) => ()
+          Err(err) => return Err(err)
+        }
     }
   }
   Ok(())
 }
-

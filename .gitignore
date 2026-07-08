@@ -14,6 +14,14 @@ node_modules/
 trace.json
 .scratch/
 
+# Generated interface files
+*.generated.mbti
+
+# Local archives and nested checkout folders
+*.zip
+moonbit-main/
+Moonbit-Submit-main/
+
 # Editor and OS files
 .DS_Store
 Thumbs.db

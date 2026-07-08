@@ -1,12 +1,15 @@
+///|
 pub struct Parser {
   tokens : Array[Token]
   mut index : Int
 }
 
+///|
 pub fn Parser::new(tokens : Array[Token]) -> Parser {
   { tokens, index: 0 }
 }
 
+///|
 fn current(p : Parser) -> Token {
   if p.index >= p.tokens.length() {
     { kind: Eof, line: 0, column: 0 }
@@ -15,12 +18,14 @@ fn current(p : Parser) -> Token {
   }
 }
 
+///|
 fn advance(p : Parser) -> Token {
   let token = current(p)
   p.index = p.index + 1
   token
 }
 
+///|
 fn unexpected(token : Token) -> ParseError {
   match token.kind {
     Eof => UnexpectedEof(token.line, token.column)
@@ -28,6 +33,7 @@ fn unexpected(token : Token) -> ParseError {
   }
 }
 
+///|
 fn expect_ident(p : Parser) -> Result[String, ParseError] {
   let token = advance(p)
   match token.kind {
@@ -36,6 +42,7 @@ fn expect_ident(p : Parser) -> Result[String, ParseError] {
   }
 }
 
+///|
 fn expect_int_token(p : Parser) -> Result[Token, ParseError] {
   let token = advance(p)
   match token.kind {
@@ -44,6 +51,7 @@ fn expect_int_token(p : Parser) -> Result[Token, ParseError] {
   }
 }
 
+///|
 fn token_int(token : Token) -> Int {
   match token.kind {
     IntLit(value) => value
@@ -51,6 +59,7 @@ fn token_int(token : Token) -> Int {
   }
 }
 
+///|
 fn expect_kind(p : Parser, expected : String) -> Result[Unit, ParseError] {
   let token = advance(p)
   if token_name(token.kind) == expected {
@@ -60,10 +69,11 @@ fn expect_kind(p : Parser, expected : String) -> Result[Unit, ParseError] {
   }
 }
 
+///|
 fn parse_package(p : Parser) -> Result[String, ParseError] {
   let token = advance(p)
   match token.kind {
-    KeywordPackage => {
+    KeywordPackage =>
       match expect_ident(p) {
         Err(err) => Err(err)
         Ok(first) => {
@@ -83,25 +93,27 @@ fn parse_package(p : Parser) -> Result[String, ParseError] {
           Ok(name)
         }
       }
-    }
     _ => Err(unexpected(token))
   }
 }
 
+///|
 fn parse_type(p : Parser) -> Result[TypeRef, ParseError] {
   match expect_ident(p) {
     Err(err) => Err(err)
-    Ok(name) => {
+    Ok(name) =>
       if name == "List" {
         match expect_kind(p, "[") {
           Err(err) => Err(err)
-          Ok(_) => match parse_type(p) {
-            Err(err) => Err(err)
-            Ok(inner) => match expect_kind(p, "]") {
-              Ok(_) => Ok(ListType(inner))
+          Ok(_) =>
+            match parse_type(p) {
               Err(err) => Err(err)
+              Ok(inner) =>
+                match expect_kind(p, "]") {
+                  Ok(_) => Ok(ListType(inner))
+                  Err(err) => Err(err)
+                }
             }
-          }
         }
       } else {
         match name {
@@ -114,10 +126,10 @@ fn parse_type(p : Parser) -> Result[TypeRef, ParseError] {
           _ => Ok(NamedType(name))
         }
       }
-    }
   }
 }
 
+///|
 fn parse_reserved(p : Parser) -> Result[Array[Int], ParseError] {
   ignore(advance(p))
   match expect_int_token(p) {
@@ -128,23 +140,30 @@ fn parse_reserved(p : Parser) -> Result[Array[Int], ParseError] {
           ignore(advance(p))
           match expect_kind(p, ".") {
             Err(err) => Err(err)
-            Ok(_) => match expect_int_token(p) {
-              Err(err) => Err(err)
-              Ok(end_token) => {
-                let end = token_int(end_token)
-                if end < start {
-                  Err(UnexpectedToken("reserved range end before start", end_token.line, end_token.column))
-                } else {
-                  let numbers : Array[Int] = []
-                  let mut number = start
-                  while number <= end {
-                    numbers.push(number)
-                    number = number + 1
+            Ok(_) =>
+              match expect_int_token(p) {
+                Err(err) => Err(err)
+                Ok(end_token) => {
+                  let end = token_int(end_token)
+                  if end < start {
+                    Err(
+                      UnexpectedToken(
+                        "reserved range end before start",
+                        end_token.line,
+                        end_token.column,
+                      ),
+                    )
+                  } else {
+                    let numbers : Array[Int] = []
+                    let mut number = start
+                    while number <= end {
+                      numbers.push(number)
+                      number = number + 1
+                    }
+                    Ok(numbers)
                   }
-                  Ok(numbers)
                 }
               }
-            }
           }
         }
         _ => Ok([start])
@@ -154,6 +173,7 @@ fn parse_reserved(p : Parser) -> Result[Array[Int], ParseError] {
   }
 }
 
+///|
 fn parse_field(p : Parser) -> Result[FieldDecl, ParseError] {
   match expect_int_token(p) {
     Err(err) => Err(err)
@@ -161,73 +181,91 @@ fn parse_field(p : Parser) -> Result[FieldDecl, ParseError] {
       let number = token_int(number_token)
       match expect_kind(p, ":") {
         Err(err) => Err(err)
-        Ok(_) => match expect_ident(p) {
-          Err(err) => Err(err)
-          Ok(name) => match parse_type(p) {
+        Ok(_) =>
+          match expect_ident(p) {
             Err(err) => Err(err)
-            Ok(ty) => {
-              let optional = match current(p).kind {
-                Question => {
-                  ignore(advance(p))
-                  true
+            Ok(name) =>
+              match parse_type(p) {
+                Err(err) => Err(err)
+                Ok(ty) => {
+                  let optional = match current(p).kind {
+                    Question => {
+                      ignore(advance(p))
+                      true
+                    }
+                    _ => false
+                  }
+                  let deprecated = match current(p).kind {
+                    KeywordDeprecated => {
+                      ignore(advance(p))
+                      true
+                    }
+                    _ => false
+                  }
+                  Ok({
+                    number,
+                    name,
+                    ty,
+                    optional,
+                    deprecated,
+                    line: number_token.line,
+                    column: number_token.column,
+                  })
                 }
-                _ => false
               }
-              let deprecated = match current(p).kind {
-                KeywordDeprecated => {
-                  ignore(advance(p))
-                  true
-                }
-                _ => false
-              }
-              Ok({ number, name, ty, optional, deprecated, line: number_token.line, column: number_token.column })
-            }
           }
-        }
       }
     }
   }
 }
 
+///|
 fn parse_message(p : Parser) -> Result[MessageDecl, ParseError] {
   let token = advance(p)
   match token.kind {
-    KeywordMessage => match expect_ident(p) {
-      Err(err) => Err(err)
-      Ok(name) => match expect_kind(p, "{") {
+    KeywordMessage =>
+      match expect_ident(p) {
         Err(err) => Err(err)
-        Ok(_) => {
-          let fields : Array[FieldDecl] = []
-          let reserved_numbers : Array[Int] = []
-          while true {
-            match current(p).kind {
-              RBrace => {
-                ignore(advance(p))
-                break
-              }
-              KeywordReserved => match parse_reserved(p) {
-                Ok(numbers) => {
-                  for number in numbers {
-                    reserved_numbers.push(number)
+        Ok(name) =>
+          match expect_kind(p, "{") {
+            Err(err) => Err(err)
+            Ok(_) => {
+              let fields : Array[FieldDecl] = []
+              let reserved_numbers : Array[Int] = []
+              while true {
+                match current(p).kind {
+                  RBrace => {
+                    ignore(advance(p))
+                    break
                   }
+                  KeywordReserved =>
+                    match parse_reserved(p) {
+                      Ok(numbers) =>
+                        for number in numbers {
+                          reserved_numbers.push(number)
+                        }
+                      Err(err) => return Err(err)
+                    }
+                  Eof =>
+                    return Err(
+                      UnexpectedEof(current(p).line, current(p).column),
+                    )
+                  _ =>
+                    match parse_field(p) {
+                      Ok(field) => fields.push(field)
+                      Err(err) => return Err(err)
+                    }
                 }
-                Err(err) => return Err(err)
               }
-              Eof => return Err(UnexpectedEof(current(p).line, current(p).column))
-              _ => match parse_field(p) {
-                Ok(field) => fields.push(field)
-                Err(err) => return Err(err)
-              }
+              Ok({ name, fields, reserved_numbers })
             }
           }
-          Ok({ name, fields, reserved_numbers })
-        }
       }
-    }
     _ => Err(unexpected(token))
   }
 }
 
+///|
 fn parse_enum_case(p : Parser) -> Result[EnumCase, ParseError] {
   match expect_int_token(p) {
     Err(err) => Err(err)
@@ -235,54 +273,69 @@ fn parse_enum_case(p : Parser) -> Result[EnumCase, ParseError] {
       let number = token_int(number_token)
       match expect_kind(p, ":") {
         Err(err) => Err(err)
-        Ok(_) => match expect_ident(p) {
-          Ok(name) => Ok({ number, name, line: number_token.line, column: number_token.column })
-          Err(err) => Err(err)
-        }
+        Ok(_) =>
+          match expect_ident(p) {
+            Ok(name) =>
+              Ok({
+                number,
+                name,
+                line: number_token.line,
+                column: number_token.column,
+              })
+            Err(err) => Err(err)
+          }
       }
     }
   }
 }
 
+///|
 fn parse_enum(p : Parser) -> Result[EnumDecl, ParseError] {
   let token = advance(p)
   match token.kind {
-    KeywordEnum => match expect_ident(p) {
-      Err(err) => Err(err)
-      Ok(name) => match expect_kind(p, "{") {
+    KeywordEnum =>
+      match expect_ident(p) {
         Err(err) => Err(err)
-        Ok(_) => {
-          let cases : Array[EnumCase] = []
-          let reserved_numbers : Array[Int] = []
-          while true {
-            match current(p).kind {
-              RBrace => {
-                ignore(advance(p))
-                break
-              }
-              KeywordReserved => match parse_reserved(p) {
-                Ok(numbers) => {
-                  for number in numbers {
-                    reserved_numbers.push(number)
+        Ok(name) =>
+          match expect_kind(p, "{") {
+            Err(err) => Err(err)
+            Ok(_) => {
+              let cases : Array[EnumCase] = []
+              let reserved_numbers : Array[Int] = []
+              while true {
+                match current(p).kind {
+                  RBrace => {
+                    ignore(advance(p))
+                    break
                   }
+                  KeywordReserved =>
+                    match parse_reserved(p) {
+                      Ok(numbers) =>
+                        for number in numbers {
+                          reserved_numbers.push(number)
+                        }
+                      Err(err) => return Err(err)
+                    }
+                  Eof =>
+                    return Err(
+                      UnexpectedEof(current(p).line, current(p).column),
+                    )
+                  _ =>
+                    match parse_enum_case(p) {
+                      Ok(item) => cases.push(item)
+                      Err(err) => return Err(err)
+                    }
                 }
-                Err(err) => return Err(err)
               }
-              Eof => return Err(UnexpectedEof(current(p).line, current(p).column))
-              _ => match parse_enum_case(p) {
-                Ok(item) => cases.push(item)
-                Err(err) => return Err(err)
-              }
+              Ok({ name, cases, reserved_numbers })
             }
           }
-          Ok({ name, cases, reserved_numbers })
-        }
       }
-    }
     _ => Err(unexpected(token))
   }
 }
 
+///|
 pub fn parse_tokens(tokens : Array[Token]) -> Result[Schema, ParseError] {
   let parser = Parser::new(tokens)
   match parse_package(parser) {
@@ -291,14 +344,16 @@ pub fn parse_tokens(tokens : Array[Token]) -> Result[Schema, ParseError] {
       let declarations : Array[Decl] = []
       while true {
         match current(parser).kind {
-          KeywordMessage => match parse_message(parser) {
-            Ok(msg) => declarations.push(Message(msg))
-            Err(err) => return Err(err)
-          }
-          KeywordEnum => match parse_enum(parser) {
-            Ok(en) => declarations.push(Enum(en))
-            Err(err) => return Err(err)
-          }
+          KeywordMessage =>
+            match parse_message(parser) {
+              Ok(msg) => declarations.push(Message(msg))
+              Err(err) => return Err(err)
+            }
+          KeywordEnum =>
+            match parse_enum(parser) {
+              Ok(en) => declarations.push(Enum(en))
+              Err(err) => return Err(err)
+            }
           Eof => break
           _ => return Err(unexpected(current(parser)))
         }
@@ -308,6 +363,7 @@ pub fn parse_tokens(tokens : Array[Token]) -> Result[Schema, ParseError] {
   }
 }
 
+///|
 pub fn parse_schema(input : String) -> Result[Schema, ParseError] {
   parse_tokens(lex(input))
 }

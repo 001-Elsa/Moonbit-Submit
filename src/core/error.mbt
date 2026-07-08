@@ -1,3 +1,4 @@
+///|
 pub enum DecodeError {
   UnexpectedEof
   MalformedVarint
@@ -6,6 +7,7 @@ pub enum DecodeError {
   Utf8Error
 }
 
+///|
 pub enum EncodeError {
   InvalidFieldNumber(Int)
 }

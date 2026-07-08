@@ -1,0 +1,38 @@
+name: Check
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  moonbit:
+    name: MoonBit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup MoonBit
+        uses: hustcer/setup-moonbit@v1
+
+      - name: Update MoonBit registry
+        run: moon update
+
+      - name: Check
+        run: moon check
+
+      - name: Test
+        run: moon test
+
+      - name: Format check
+        run: moon fmt --check
+
+      - name: Info check
+        run: |
+          moon info
+          git diff --exit-code
+
+      - name: CLI smoke test
+        shell: pwsh
+        run: ./scripts/check.ps1

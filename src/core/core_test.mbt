@@ -1,9 +1,11 @@
+///|
 test "varint encoded length" {
   inspect(encoded_varint_len(0L), content="1")
   inspect(encoded_varint_len(127L), content="1")
   inspect(encoded_varint_len(128L), content="2")
 }
 
+///|
 test "wire key roundtrip" {
   let writer = Writer::new()
   match write_key(writer, 7, LengthDelimited) {

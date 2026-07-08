@@ -1,3 +1,4 @@
+///|
 pub fn upper_first(name : String) -> String {
   if name.length() == 0 {
     name
@@ -6,6 +7,7 @@ pub fn upper_first(name : String) -> String {
   }
 }
 
+///|
 pub fn lower_first(name : String) -> String {
   if name.length() == 0 {
     name
@@ -14,10 +16,12 @@ pub fn lower_first(name : String) -> String {
   }
 }
 
+///|
 fn is_upper_code(code : Int) -> Bool {
   code >= 65 && code <= 90
 }
 
+///|
 fn lower_code_unit(code : Int) -> String {
   if is_upper_code(code) {
     String::from_array([Int::unsafe_to_char(code + 32)])
@@ -26,6 +30,7 @@ fn lower_code_unit(code : Int) -> String {
   }
 }
 
+///|
 pub fn snake_name(name : String) -> String {
   let mut out = ""
   let mut i = 0
@@ -40,6 +45,7 @@ pub fn snake_name(name : String) -> String {
   out
 }
 
+///|
 pub fn package_to_path(package_name : String) -> String {
   let mut out = ""
   for ch in package_name {
@@ -52,6 +58,7 @@ pub fn package_to_path(package_name : String) -> String {
   out
 }
 
+///|
 pub fn moonbit_type_name(ty : @schema.TypeRef, optional : Bool) -> String {
   let base = match ty {
     @schema.BoolType => "Bool"
