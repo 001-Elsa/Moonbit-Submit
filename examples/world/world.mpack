@@ -1,0 +1,110 @@
+package demo.world
+
+enum TerrainKind {
+  0: Plains
+  1: Forest
+  2: Mountain
+  3: Water
+}
+
+enum ItemKind {
+  0: UnknownItem
+  1: Weapon
+  2: Armor
+  3: Consumable
+  4: Quest
+}
+
+enum QuestState {
+  0: Locked
+  1: Available
+  2: Active
+  3: Complete
+}
+
+message Vec3 {
+  1: x Double
+  2: y Double
+  3: z Double
+}
+
+message ResourceStack {
+  1: resource_id String
+  2: amount Int
+}
+
+message TerrainTile {
+  1: tile_id Int
+  2: kind TerrainKind
+  3: elevation Double
+  4: resources List[ResourceStack]
+}
+
+message ItemStack {
+  1: item_id String
+  2: kind ItemKind
+  3: count Int
+  4: durability Int?
+}
+
+message Inventory {
+  1: owner_id String
+  2: capacity Int
+  3: items List[ItemStack]
+}
+
+message SkillProgress {
+  1: skill_id String
+  2: level Int
+  3: experience Int64
+}
+
+message PlayerProfile {
+  1: player_id String
+  2: display_name String
+  3: position Vec3
+  4: inventory Inventory
+  5: skills List[SkillProgress]
+}
+
+message QuestObjective {
+  1: objective_id String
+  2: target_count Int
+  3: current_count Int
+}
+
+message QuestLogEntry {
+  1: quest_id String
+  2: state QuestState
+  3: objectives List[QuestObjective]
+  4: note String?
+}
+
+message NpcState {
+  1: npc_id String
+  2: position Vec3
+  3: active_quest QuestLogEntry?
+}
+
+message RegionState {
+  1: region_id String
+  2: tiles List[TerrainTile]
+  3: npcs List[NpcState]
+}
+
+message WorldClock {
+  1: day Int
+  2: tick Int64
+  3: paused Bool
+}
+
+message WorldSave {
+  reserved 90..99
+  1: save_id String
+  2: version Int
+  3: clock WorldClock
+  4: players List[PlayerProfile]
+  5: regions List[RegionState]
+  6: quests List[QuestLogEntry]
+  7: debug_note String? deprecated
+}

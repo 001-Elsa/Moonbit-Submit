@@ -31,6 +31,21 @@ moon run src/cli -- gen examples/savegame/savegame.mpack -o generated
 moon run src/cli -- doc examples/savegame/savegame.mpack -o docs/generated
 ```
 
+## `world/world.mpack`
+
+Shows a larger game-world schema with multiple enums, nested messages, repeated
+message fields, optional nested messages, reserved ranges, and a deprecated
+debug field. This fixture is intended to exercise code generation at a larger
+scale than the minimal savegame example.
+
+Run:
+
+```powershell
+moon run src/cli -- check examples/world/world.mpack
+moon run src/cli -- gen examples/world/world.mpack -o generated
+moon run src/cli -- doc examples/world/world.mpack -o docs/generated
+```
+
 ## `compat/`
 
 Contains schema evolution fixtures:

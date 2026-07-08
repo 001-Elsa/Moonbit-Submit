@@ -23,6 +23,10 @@ moon run src/cli -- check examples/savegame/savegame.mpack
 moon run src/cli -- compat examples/compat/savegame_v1.mpack examples/compat/savegame_v2.mpack
 moon run src/cli -- gen examples/savegame/savegame.mpack -o generated
 moon run src/cli -- doc examples/savegame/savegame.mpack -o docs/generated
+moon run src/cli -- check examples/world/world.mpack
+moon run src/cli -- gen examples/world/world.mpack -o generated
+moon run src/cli -- doc examples/world/world.mpack -o docs/generated
+moon fmt
 moon check
 moon test
 
