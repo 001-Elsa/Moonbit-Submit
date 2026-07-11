@@ -1,4 +1,22 @@
+param(
+  [switch]$Update
+)
+
 $ErrorActionPreference = "Stop"
+
+function Invoke-Checked {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Exe,
+    [Parameter(ValueFromRemainingArguments = $true)]
+    [string[]]$Args
+  )
+
+  & $Exe @Args
+  if ($LASTEXITCODE -ne 0) {
+    throw "Command failed: $Exe $($Args -join ' ')"
+  }
+}
 
 $root = Split-Path -Parent $PSScriptRoot
 $localMoonHome = Join-Path $root ".moonhome"
@@ -15,20 +33,26 @@ if (Test-Path $localMoonHome) {
   Write-Output "Using MoonBit toolchain from PATH."
 }
 
-moon version --all
-moon check
-moon test
-moon run src/cli -- check examples/auth/auth.mpack
-moon run src/cli -- check examples/savegame/savegame.mpack
-moon run src/cli -- compat examples/compat/savegame_v1.mpack examples/compat/savegame_v2.mpack
-moon run src/cli -- gen examples/savegame/savegame.mpack -o generated
-moon run src/cli -- doc examples/savegame/savegame.mpack -o docs/generated
-moon run src/cli -- check examples/world/world.mpack
-moon run src/cli -- gen examples/world/world.mpack -o generated
-moon run src/cli -- doc examples/world/world.mpack -o docs/generated
-moon fmt
-moon check
-moon test
+Invoke-Checked moon version --all
+if ($Update -or $env:CI -eq "true") {
+  Invoke-Checked moon update
+}
+Invoke-Checked moon check
+Invoke-Checked moon build
+Invoke-Checked moon test
+Invoke-Checked moon run src/cli -- check examples/auth/auth.mpack
+Invoke-Checked moon run src/cli -- check examples/savegame/savegame.mpack
+Invoke-Checked moon run src/cli -- compat examples/compat/savegame_v1.mpack examples/compat/savegame_v2.mpack
+Invoke-Checked moon run src/cli -- gen examples/savegame/savegame.mpack -o generated
+Invoke-Checked moon run src/cli -- doc examples/savegame/savegame.mpack -o docs/generated
+Invoke-Checked moon run src/cli -- check examples/world/world.mpack
+Invoke-Checked moon run src/cli -- gen examples/world/world.mpack -o generated
+Invoke-Checked moon run src/cli -- doc examples/world/world.mpack -o docs/generated
+Invoke-Checked moon fmt
+Invoke-Checked moon check
+Invoke-Checked moon build
+Invoke-Checked moon test
+Invoke-Checked moon package --list
 
 $invalidOutput = moon run src/cli -- check examples/invalid/reserved.mpack 2>&1
 if ($LASTEXITCODE -eq 0) {
@@ -47,3 +71,5 @@ if (-not ($badCompatOutput -join "`n").Contains("removed field 2 without reservi
   throw "compat check did not report removed unreserved field"
 }
 Write-Output $badCompatOutput
+
+exit 0

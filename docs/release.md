@@ -37,9 +37,25 @@ Run the following commands before publishing or submitting a new acceptance buil
 ```powershell
 moon update
 moon check
+moon build
 moon test
 moon package --list
 ```
+
+For a full local acceptance run:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\check.ps1
+```
+
+On Unix-like shells:
+
+```bash
+bash scripts/check.sh
+```
+
+Use `.\scripts\check.ps1 -Update` or `bash scripts/check.sh --update` in a
+fresh CI-like environment.
 
 The package should include source code, examples, generated demo files,
 documentation, the proposal, and the root `LICENSE`. It should not include local

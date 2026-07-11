@@ -1,12 +1,12 @@
-name: Check
+name: CI
 
 on:
   push:
   pull_request:
 
 jobs:
-  moonbit:
-    name: MoonBit
+  check-build-test:
+    name: Check, build, and test
     runs-on: ubuntu-latest
 
     steps:
@@ -22,5 +22,15 @@ jobs:
       - name: Check
         run: moon check
 
+      - name: Build
+        run: moon build
+
       - name: Test
         run: moon test
+
+      - name: Verify examples and generated outputs
+        shell: pwsh
+        run: ./scripts/check.ps1 -Update
+
+      - name: Ensure generated files are committed
+        run: git diff --exit-code

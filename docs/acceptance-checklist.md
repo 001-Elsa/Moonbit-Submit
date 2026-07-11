@@ -5,7 +5,9 @@ Use this checklist before submitting MoonPack for contest review.
 ## Required Checks
 
 - `moon check` passes locally.
+- `moon build` passes locally.
 - `moon test` passes locally.
+- `scripts/check.ps1` or `scripts/check.sh` passes locally.
 - GitHub Actions latest run passes on the default branch.
 - GitHub and Gitlink point to the same latest commit.
 - Gitlink default branch contains the full project, not only a placeholder README.
@@ -31,6 +33,10 @@ Check the package contents with:
 ```powershell
 moon package --list
 ```
+
+The CI workflow also runs `moon check`, `moon build`, `moon test`, CLI smoke
+tests, generated demo refreshes, package listing, and a final `git diff
+--exit-code` so generated files must remain reproducible.
 
 ## Review Notes
 

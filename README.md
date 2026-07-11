@@ -47,13 +47,43 @@ library that is easier to inspect, extend, and use in contest-sized projects.
 This repository contains a working MVP. It can parse `.mpack` schemas, validate
 them, generate MoonBit code, and run generated round-trip tests.
 
+## Installation
+
+Install the MoonBit toolchain first, then clone and verify this repository:
+
+```bash
+git clone https://github.com/001-Elsa/Moonbit-Submit.git
+cd Moonbit-Submit
+moon update
+moon check
+moon build
+moon test
+```
+
+On Windows, the full local acceptance run is:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\check.ps1
+```
+
+On Unix-like shells:
+
+```bash
+bash scripts/check.sh
+```
+
+Pass `-Update` on PowerShell or `--update` on Bash to force a registry update;
+CI does this automatically.
+
 ## Acceptance Status
 
 - GitHub repository: https://github.com/001-Elsa/Moonbit-Submit
 - Gitlink repository: https://gitlink.org.cn/Hanzzz/MoonPack_Hz
 - Mooncakes package: `001-Elsa/moonpack@0.1.1`
-- CI command set: `moon check` and `moon test`
-- Local verification script: `powershell -ExecutionPolicy Bypass -File .\scripts\check.ps1`
+- CI command set: `moon check`, `moon build`, `moon test`, CLI smoke tests,
+  generated-output reproducibility checks, and package listing.
+- Local verification scripts: `scripts/check.ps1` and `scripts/check.sh`
+- License: Apache-2.0
 
 Fetch the published package with:
 
@@ -90,11 +120,9 @@ moonpack gen examples/auth/auth.mpack -o generated [--no-tests]
 moonpack doc examples/savegame/savegame.mpack -o docs/generated
 ```
 
-From this workspace:
+From a cloned workspace:
 
-```powershell
-$env:PATH='D:\moonbit\.moonhome\bin;' + $env:PATH
-$env:MOON_HOME='D:\moonbit\.moonhome'
+```bash
 moon run src/cli -- check examples/auth/auth.mpack
 moon run src/cli -- compat examples/compat/savegame_v1.mpack examples/compat/savegame_v2.mpack
 moon run src/cli -- gen examples/savegame/savegame.mpack -o generated
@@ -123,6 +151,31 @@ documented: docs/generated/demo/savegame.md
 Total tests: 17, passed: 17, failed: 0.
 error: examples/invalid/reserved.mpack:5:3: field number 1 is reserved in message User
 error: compat failed: message Save removed field 2 without reserving it
+```
+
+## Minimal Runnable Example
+
+Validate the small auth schema:
+
+```bash
+moon run src/cli -- check examples/auth/auth.mpack
+```
+
+Generate MoonBit code and tests for the savegame schema:
+
+```bash
+moon run src/cli -- gen examples/savegame/savegame.mpack -o generated
+moon test
+```
+
+The generated package exposes helpers such as:
+
+```text
+default_save_game()
+sample_save_game()
+equal_save_game(lhs, rhs)
+encode_save_game(value)
+decode_save_game(bytes)
 ```
 
 ## Flow
@@ -161,7 +214,11 @@ flowchart LR
 ## Current Verification
 
 - `moon check`: passing.
-- `moon test`: passing with 17 tests, including generated value round-trip tests.
+- `moon build`: passing.
+- `moon test`: passing with package tests and generated value round-trip tests.
+- `scripts/check.ps1` / `scripts/check.sh`: cover check, build, tests, CLI
+  success paths, CLI failure diagnostics, compatibility checks, generated demo
+  refreshes, documentation generation, formatting, and package listing.
 
 The generated MVP supports scalar fields, optional fields, repeated fields via
 `List[T]`, enums, nested messages, and Double via fixed64.
@@ -169,7 +226,7 @@ The generated MVP supports scalar fields, optional fields, repeated fields via
 Schema evolution supports marking fields as deprecated before reserving and
 removing their field numbers in later versions.
 
-## Demo
+## Demo Schema
 
 ```text
 package demo.savegame
@@ -190,20 +247,10 @@ message SaveGame {
 }
 ```
 
-Generated API names are stable snake_case:
-
-```text
-default_save_game()
-sample_save_game()
-equal_save_game(lhs, rhs)
-encode_save_game(value)
-decode_save_game(bytes)
-```
-
 ## Repository Layout
 
 ```text
-D:\moonbit\
+.
   README.md
   LICENSE
   moon.mod

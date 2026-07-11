@@ -1,11 +1,11 @@
 # Implementation Status
 
-Created in `D:\moonbit`.
+MoonPack is implemented as a MoonBit module in this repository.
 
 ## Done
 
 - Project plan in `plan.md`.
-- Moon module metadata in `moon.mod.json`.
+- Moon module metadata in `moon.mod`.
 - Package layout under `src/`.
 - Core wire-format files:
   - `src/core/error.mbt`
@@ -40,28 +40,24 @@ Created in `D:\moonbit`.
 
 ## Toolchain
 
-MoonBit was installed under `D:\moonbit\.moonhome` with `MOON_HOME` set to that
-directory. The official installer script was downloaded to
-`D:\moonbit\.downloads\moonbit-install.ps1` and run with both `HOME` and
-`MOON_HOME` redirected under `D:\moonbit`.
-
-The project also contains the earlier downloaded zip under `D:\moonbit\.downloads`
-and extracted binaries under `D:\moonbit\.toolchains`.
+Use a standard MoonBit toolchain with `moon` available on `PATH`. The helper
+scripts also support a local `.moonhome` directory under the project root or its
+parent directory.
 
 ## Verified
 
-Run from `D:\moonbit`:
+Run from the repository root:
 
 ```powershell
-$env:PATH='D:\moonbit\.moonhome\bin;' + $env:PATH
-$env:MOON_HOME='D:\moonbit\.moonhome'
 moon check
+moon build
 moon test
 ```
 
 Current result:
 
 - `moon check`: passed.
+- `moon build`: passed.
 - `moon test`: passed with package tests and generated default round-trip tests.
 
 CLI checks:
