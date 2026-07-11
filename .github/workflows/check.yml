@@ -19,18 +19,27 @@ jobs:
       - name: Update MoonBit registry
         run: moon update
 
-      - name: Check
-        run: moon check
+      - name: Format check
+        run: moon fmt --check
+
+      - name: Check all targets
+        run: moon check --target all --deny-warn
 
       - name: Build
         run: moon build
 
-      - name: Test
-        run: moon test
+      - name: Test all targets
+        run: moon test --target all --deny-warn
 
       - name: Verify examples and generated outputs
         shell: pwsh
         run: ./scripts/check.ps1 -Update
+
+      - name: Package metadata
+        run: moon info
+
+      - name: Build package
+        run: moon package
 
       - name: Ensure generated files are committed
         run: git diff --exit-code
