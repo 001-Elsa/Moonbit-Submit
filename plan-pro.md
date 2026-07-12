@@ -24,7 +24,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\check.ps1
 预期基线结果：
 
 ```text
-Total tests: 17, passed: 17, failed: 0.
+Total tests: 43, passed: 43, failed: 0.
 ok: demo.auth
 ok: demo.savegame
 ok: compatible

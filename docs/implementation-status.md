@@ -20,11 +20,11 @@ MoonPack is implemented as a MoonBit module in this repository.
   - `src/schema/lexer.mbt`
   - `src/schema/parser.mbt`
   - `src/schema/validate.mbt`
-- Code generation skeleton:
+- Code generation implementation:
   - `src/codegen/names.mbt`
   - `src/codegen/moonbit_writer.mbt`
   - `src/codegen/emit.mbt`
-- CLI entry skeleton:
+- CLI implementation:
   - `src/cli/main.mbt`
 - Generated sample package:
   - `generated/demo/savegame/moon.pkg`

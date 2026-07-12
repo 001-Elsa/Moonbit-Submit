@@ -148,7 +148,7 @@ ok: demo.auth
 ok: compatible
 generated: generated/demo/savegame (7 files)
 documented: docs/generated/demo/savegame.md
-Total tests: 17, passed: 17, failed: 0.
+Total tests: 43, passed: 43, failed: 0.
 error: examples/invalid/reserved.mpack:5:3: field number 1 is reserved in message User
 error: compat failed: message Save removed field 2 without reserving it
 ```
