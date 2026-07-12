@@ -1,5 +1,20 @@
 # Release Notes
 
+## 0.1.2
+
+MoonPack 0.1.2 refreshes the final contest submission metadata, contact
+information, verification evidence, and documentation consistency.
+
+```text
+001-Elsa/moonpack@0.1.2
+```
+
+Verify the published package with:
+
+```powershell
+moon fetch 001-Elsa/moonpack@0.1.2
+```
+
 ## 0.1.1
 
 MoonPack 0.1.1 refreshes the contest package after documentation, acceptance
@@ -66,4 +81,4 @@ interface files.
 
 - GitHub: https://github.com/001-Elsa/Moonbit-Submit
 - Gitlink: https://gitlink.org.cn/Hanzzz/MoonPack_Hz
-- Mooncakes package: `001-Elsa/moonpack@0.1.1`
+- Mooncakes package: `001-Elsa/moonpack@0.1.2`

@@ -10,7 +10,7 @@
 | Phone | 17889572851 |
 | GitHub repository | https://github.com/001-Elsa/Moonbit-Submit |
 | Gitlink repository | https://gitlink.org.cn/Hanzzz/MoonPack_Hz |
-| Mooncakes package | `001-Elsa/moonpack@0.1.1` |
+| Mooncakes package | `001-Elsa/moonpack@0.1.2` |
 | Project direction | MoonBit infrastructure / developer tooling / data serialization |
 | Project type | Original project |
 
@@ -58,8 +58,8 @@ Reference project:
 - GitHub Actions verified CI passed:
   https://github.com/001-Elsa/Moonbit-Submit/actions/runs/29194651605
 - GitHub and Gitlink are synchronized to the final submission contents.
-- Published Mooncakes package: `001-Elsa/moonpack@0.1.1`
-- Package fetch command: `moon fetch 001-Elsa/moonpack@0.1.1`
+- Published Mooncakes package: `001-Elsa/moonpack@0.1.2`
+- Package fetch command: `moon fetch 001-Elsa/moonpack@0.1.2`
 - Root `LICENSE` is Apache-2.0.
 
 ## Submission Links
@@ -67,4 +67,4 @@ Reference project:
 - GitHub: https://github.com/001-Elsa/Moonbit-Submit
 - Gitlink: https://gitlink.org.cn/Hanzzz/MoonPack_Hz
 - CI: https://github.com/001-Elsa/Moonbit-Submit/actions/runs/29194651605
-- Mooncakes: `001-Elsa/moonpack@0.1.1`
+- Mooncakes: `001-Elsa/moonpack@0.1.2`

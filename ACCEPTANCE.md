@@ -7,7 +7,7 @@ Use this file as the root-level submission checklist for MoonPack.
 - GitHub: https://github.com/001-Elsa/Moonbit-Submit
 - Gitlink: https://gitlink.org.cn/Hanzzz/MoonPack_Hz
 - GitHub Actions verified passing CI: https://github.com/001-Elsa/Moonbit-Submit/actions/runs/29194651605
-- Mooncakes package: `001-Elsa/moonpack@0.1.1`
+- Mooncakes package: `001-Elsa/moonpack@0.1.2`
 
 ## Required Local Checks
 
@@ -31,7 +31,7 @@ It covers:
 - `moon package --list`
 
 Latest observed result: 43 tests passed and package output was generated at
-`_build\publish\001-Elsa-moonpack-0.1.1.zip`.
+`_build\publish\001-Elsa-moonpack-0.1.2.zip`.
 
 ## Submission State
 

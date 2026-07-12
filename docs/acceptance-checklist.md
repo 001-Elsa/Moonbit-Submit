@@ -11,8 +11,8 @@ Use this checklist before submitting MoonPack for contest review.
 - GitHub Actions latest run passes on the default branch.
 - GitHub and Gitlink point to the same latest commit.
 - Gitlink default branch contains the full project, not only a placeholder README.
-- The project is published as `001-Elsa/moonpack@0.1.1`.
-- The package can be fetched with `moon fetch 001-Elsa/moonpack@0.1.1`.
+- The project is published as `001-Elsa/moonpack@0.1.2`.
+- The package can be fetched with `moon fetch 001-Elsa/moonpack@0.1.2`.
 - Root `LICENSE` is present and matches the `license` field in `moon.mod`.
 
 ## Package Cleanliness

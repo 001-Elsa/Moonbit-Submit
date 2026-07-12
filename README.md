@@ -79,7 +79,7 @@ CI does this automatically.
 
 - GitHub repository: https://github.com/001-Elsa/Moonbit-Submit
 - Gitlink repository: https://gitlink.org.cn/Hanzzz/MoonPack_Hz
-- Mooncakes package: `001-Elsa/moonpack@0.1.1`
+- Mooncakes package: `001-Elsa/moonpack@0.1.2`
 - CI command set: `moon check`, `moon build`, `moon test`, CLI smoke tests,
   generated-output reproducibility checks, and package listing.
 - Local verification scripts: `scripts/check.ps1` and `scripts/check.sh`
@@ -88,7 +88,7 @@ CI does this automatically.
 Fetch the published package with:
 
 ```powershell
-moon fetch 001-Elsa/moonpack@0.1.1
+moon fetch 001-Elsa/moonpack@0.1.2
 ```
 
 ## Example Schema
