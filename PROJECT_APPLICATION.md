@@ -55,8 +55,8 @@ Reference project:
   `powershell -ExecutionPolicy Bypass -File .\scripts\check.ps1 -Update`
 - Local tests passed: 43 tests passed.
 - GitHub Actions latest CI passed:
-  https://github.com/001-Elsa/Moonbit-Submit/actions/runs/29161109332
-- GitHub and Gitlink are synchronized to the current submission commit.
+  https://github.com/001-Elsa/Moonbit-Submit/actions/runs/29191418627
+- GitHub and Gitlink are synchronized to the final submission contents.
 - Published Mooncakes package: `001-Elsa/moonpack@0.1.1`
 - Package fetch command: `moon fetch 001-Elsa/moonpack@0.1.1`
 - Root `LICENSE` is Apache-2.0.
@@ -65,5 +65,5 @@ Reference project:
 
 - GitHub: https://github.com/001-Elsa/Moonbit-Submit
 - Gitlink: https://gitlink.org.cn/Hanzzz/MoonPack_Hz
-- CI: https://github.com/001-Elsa/Moonbit-Submit/actions/runs/29161109332
+- CI: https://github.com/001-Elsa/Moonbit-Submit/actions/runs/29191418627
 - Mooncakes: `001-Elsa/moonpack@0.1.1`

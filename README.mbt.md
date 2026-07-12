@@ -20,5 +20,5 @@ package listing with 43 tests passed.
 
 - GitHub: https://github.com/001-Elsa/Moonbit-Submit
 - Gitlink: https://gitlink.org.cn/Hanzzz/MoonPack_Hz
-- Latest passing CI: https://github.com/001-Elsa/Moonbit-Submit/actions/runs/29161109332
+- Latest passing CI: https://github.com/001-Elsa/Moonbit-Submit/actions/runs/29191418627
 - Mooncakes package: `001-Elsa/moonpack@0.1.1`
