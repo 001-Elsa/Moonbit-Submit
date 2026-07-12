@@ -14,7 +14,7 @@ pub fn ByteBuffer::push(self : ByteBuffer, byte : Byte) -> Unit {
 }
 
 ///|
-pub fn ByteBuffer::extend(self : ByteBuffer, bytes : Array[Byte]) -> Unit {
+pub fn ByteBuffer::append_all(self : ByteBuffer, bytes : Array[Byte]) -> Unit {
   for byte in bytes {
     self.data.push(byte)
   }
