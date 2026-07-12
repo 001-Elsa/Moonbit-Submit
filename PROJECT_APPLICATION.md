@@ -5,8 +5,9 @@
 | Field | Value |
 | --- | --- |
 | Project name | MoonPack: MoonBit-native schema-first binary serialization toolkit |
-| Participant | 001-Elsa |
-| Contact | Use the contact information registered in the official submission system |
+| Participant | 韩桢 |
+| Email | 766903826@qq.com |
+| Phone | 17889572851 |
 | GitHub repository | https://github.com/001-Elsa/Moonbit-Submit |
 | Gitlink repository | https://gitlink.org.cn/Hanzzz/MoonPack_Hz |
 | Mooncakes package | `001-Elsa/moonpack@0.1.1` |
