@@ -55,7 +55,7 @@ Reference project:
 - Local full acceptance script passed:
   `powershell -ExecutionPolicy Bypass -File .\scripts\check.ps1 -Update`
 - Local tests passed: 43 tests passed.
-- GitHub Actions latest CI passed:
+- GitHub Actions verified CI passed:
   https://github.com/001-Elsa/Moonbit-Submit/actions/runs/29194651605
 - GitHub and Gitlink are synchronized to the final submission contents.
 - Published Mooncakes package: `001-Elsa/moonpack@0.1.1`
